@@ -14,7 +14,7 @@ public class User {
     private String email;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference // Kullanıcının görev listelerini serileştirme
+    @JsonManagedReference
     private Set<TaskList> taskLists;
 
     // Getters and setters

@@ -12,10 +12,10 @@ public class TaskList {
 
  @ManyToOne
  @JoinColumn(name = "user_id")
- @JsonBackReference // Görev listesinin kullanıcı referansını serileştirmeme
+ @JsonBackReference
  private User user;
 
- // Getters and setters
+
  public Long getId() { return id; }
  public void setId(Long id) { this.id = id; }
 

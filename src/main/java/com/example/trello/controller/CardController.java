@@ -36,7 +36,7 @@ public class CardController {
     public ResponseEntity<Card> updateCard(@PathVariable Long id, @RequestBody Card card) {
         Optional<Card> existingCard = cardService.findById(id);
         if (existingCard.isPresent()) {
-            card.setId(id); // Ensure the ID is set for the update
+            card.setId(id);
             return ResponseEntity.ok(cardService.save(card));
         } else {
             return ResponseEntity.notFound().build();

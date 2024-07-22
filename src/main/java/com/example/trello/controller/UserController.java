@@ -24,7 +24,7 @@ public class UserController {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setEmail(userDTO.getEmail()); // Email gibi diğer alanları da set edebilirsiniz
+        user.setEmail(userDTO.getEmail());
 
         User savedUser = userService.save(user);
         UserDTO responseDTO = new UserDTO();
@@ -53,7 +53,6 @@ public class UserController {
             userDTO.setId(user.get().getId());
             userDTO.setUsername(user.get().getUsername());
             userDTO.setEmail(user.get().getEmail());
-            // Diğer gerekli alanları ekleyin
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.notFound().build();
@@ -66,7 +65,7 @@ public class UserController {
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             user.setUsername(userDTO.getUsername());
-            user.setEmail(userDTO.getEmail()); // Diğer alanları güncelleyin
+            user.setEmail(userDTO.getEmail());
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Şifreyi şifrele
             }

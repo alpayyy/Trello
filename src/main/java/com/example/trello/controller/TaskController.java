@@ -36,7 +36,7 @@ public class TaskController {
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
         Optional<Task> existingTask = taskService.findById(id);
         if (existingTask.isPresent()) {
-            task.setId(id); // Ensure the ID is set for the update
+            task.setId(id);
             return ResponseEntity.ok(taskService.save(task));
         } else {
             return ResponseEntity.notFound().build();
