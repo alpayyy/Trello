@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${springdoc.version}</version>
+			<version>1.6.4</version>
 		</dependency>
 
 		<!-- jjwt dependency for JWT token creation and validation -->
