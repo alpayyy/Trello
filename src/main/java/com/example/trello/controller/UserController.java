@@ -31,12 +31,16 @@ public class UserController {
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
+        user.setName(userDTO.getName());
+        user.setSurname(userDTO.getSurname());
 
         User savedUser = userService.save(user);
         UserDTO responseDTO = new UserDTO();
         responseDTO.setId(savedUser.getId());
         responseDTO.setUsername(savedUser.getUsername());
         responseDTO.setEmail(savedUser.getEmail());
+        responseDTO.setName(savedUser.getName());
+        responseDTO.setSurname(savedUser.getSurname());
 
         return ResponseEntity.ok(responseDTO);
     }
@@ -51,6 +55,7 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
+
     @GetMapping
     @Operation(summary = "Tüm kullanıcıları al", description = "Tüm kullanıcıların listesini alır")
     public ResponseEntity<Object> getAllUsers() {
@@ -60,6 +65,8 @@ public class UserController {
             userDTO.setId(user.getId());
             userDTO.setUsername(user.getUsername());
             userDTO.setEmail(user.getEmail());
+            userDTO.setName(user.getName());
+            userDTO.setSurname(user.getSurname());
             return userDTO;
         }).toList();
 
@@ -75,6 +82,8 @@ public class UserController {
             userDTO.setId(user.get().getId());
             userDTO.setUsername(user.get().getUsername());
             userDTO.setEmail(user.get().getEmail());
+            userDTO.setName(user.get().getName());
+            userDTO.setSurname(user.get().getSurname());
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.notFound().build();
@@ -89,6 +98,8 @@ public class UserController {
             User user = existingUser.get();
             user.setUsername(userDTO.getUsername());
             user.setEmail(userDTO.getEmail());
+            user.setName(userDTO.getName());
+            user.setSurname(userDTO.getSurname());
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Şifreyi şifrele
             }
@@ -97,6 +108,8 @@ public class UserController {
             responseDTO.setId(updatedUser.getId());
             responseDTO.setUsername(updatedUser.getUsername());
             responseDTO.setEmail(updatedUser.getEmail());
+            responseDTO.setName(updatedUser.getName());
+            responseDTO.setSurname(updatedUser.getSurname());
             return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.notFound().build();

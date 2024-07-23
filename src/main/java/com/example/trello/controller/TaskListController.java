@@ -15,29 +15,43 @@ import java.util.List;
 @RequestMapping("/api/tasklists")
 @Tag(name = "tasklists", description = "Görev Listesi API'si")
 public class TaskListController {
+
     @Autowired
     private TaskListService taskListService;
 
     @PostMapping
     @Operation(summary = "Görev listesi oluştur", description = "Yeni bir görev listesi oluşturur")
     public ResponseEntity<TaskList> createTaskList(@RequestBody TaskList taskList) {
-        return ResponseEntity.ok(taskListService.save(taskList));
+        if (taskList != null) {
+            TaskList createdTaskList = taskListService.save(taskList);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
     @Operation(summary = "Tüm görev listelerini al", description = "Tüm görev listelerinin listesini alır")
     public ResponseEntity<List<TaskList>> getAllTaskLists() {
-        return ResponseEntity.ok(taskListService.findAll());
+        List<TaskList> taskLists = taskListService.findAll();
+        if (taskLists.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(taskLists);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Görev listesini güncelle", description = "Belirtilen ID'ye sahip görev listesini günceller")
     public ResponseEntity<TaskList> updateTaskList(@PathVariable Long id, @RequestBody TaskList taskList) {
-        TaskList updatedTaskList = taskListService.update(id, taskList);
-        if (updatedTaskList != null) {
-            return ResponseEntity.ok(updatedTaskList);
+        if (taskList != null && taskList.getId() != null && taskList.getId().equals(id)) {
+            TaskList updatedTaskList = taskListService.update(id, taskList);
+            if (updatedTaskList != null) {
+                return ResponseEntity.ok(updatedTaskList);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -45,15 +59,12 @@ public class TaskListController {
     @Operation(summary = "Görev listesini sil", description = "Belirtilen ID'ye sahip görev listesini siler")
     public ResponseEntity<Void> deleteTaskList(@PathVariable Long id) {
         try {
-            if (taskListService.delete(id)) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            taskListService.deleteTaskList(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         } catch (Exception e) {
-            // Log the exception
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 }
