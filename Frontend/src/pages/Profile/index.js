@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Typography } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { ProfileContainer, ProfileAvatar, ProfilePaper, ProfileInfoItem } from './style';
 
 const Profile = () => {
-    const {user} = useSelector((state) => state.auth);
+    const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
+    if (loading) {
+        return (
+            <ProfileContainer>
+                <Typography variant="h4">Loading...</Typography>
+            </ProfileContainer>
+        );
+    }
 
     return (
         <ProfileContainer>
-            <ProfileAvatar alt={user.userName} src="/static/images/avatar/1.jpg" />
+            <ProfileAvatar alt={user.userName} />
             <Typography variant="h4">{user.firstName} {user.lastName}</Typography>
             <ProfilePaper elevation={3}>
                 <ProfileInfoItem variant="h6">
