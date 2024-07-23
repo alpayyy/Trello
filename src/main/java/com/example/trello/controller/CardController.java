@@ -44,19 +44,29 @@ public class CardController {
     @GetMapping("/{id}")
     @Operation(summary = "ID ile kart al", description = "Belirtilen ID'ye sahip kartı alır")
     public ResponseEntity<Card> getCardById(@PathVariable Long id) {
+        System.out.println("Fetching card with ID: " + id);
         Optional<Card> card = cardService.findById(id);
-        return card.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (card.isPresent()) {
+            System.out.println("Found card: " + card.get());
+            return ResponseEntity.ok(card.get());
+        } else {
+            System.out.println("Card with ID " + id + " not found.");
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Kartı güncelle", description = "Belirtilen ID'ye sahip kartı günceller")
     public ResponseEntity<Card> updateCard(@PathVariable Long id, @RequestBody Card card) {
+        System.out.println("Updating card with ID: " + id);
         Optional<Card> existingCard = cardService.findById(id);
         if (existingCard.isPresent()) {
             card.setId(id);
-            return ResponseEntity.ok(cardService.save(card));
+            Card updatedCard = cardService.save(card);
+            System.out.println("Updated Card: " + updatedCard);
+            return ResponseEntity.ok(updatedCard);
         } else {
+            System.out.println("Card with ID " + id + " not found for update.");
             return ResponseEntity.notFound().build();
         }
     }
@@ -64,10 +74,14 @@ public class CardController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Kartı sil", description = "Belirtilen ID'ye sahip kartı siler")
     public ResponseEntity<Void> deleteCard(@PathVariable Long id) {
-        if (cardService.findById(id).isPresent()) {
+        System.out.println("Deleting card with ID: " + id);
+        Optional<Card> card = cardService.findById(id);
+        if (card.isPresent()) {
             cardService.deleteById(id);
+            System.out.println("Deleted card with ID: " + id);
             return ResponseEntity.noContent().build();
         } else {
+            System.out.println("Card with ID " + id + " not found for deletion.");
             return ResponseEntity.notFound().build();
         }
     }

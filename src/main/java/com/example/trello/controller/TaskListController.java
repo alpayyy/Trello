@@ -40,10 +40,24 @@ public class TaskListController {
         return ResponseEntity.ok(taskLists);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Belirli bir görev listesini al", description = "Belirtilen ID'ye sahip görev listesini alır")
+    public ResponseEntity<TaskList> getTaskListById(@PathVariable Long id) {
+        TaskList taskList = taskListService.findById(id);
+        if (taskList != null) {
+            return ResponseEntity.ok(taskList);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Görev listesini güncelle", description = "Belirtilen ID'ye sahip görev listesini günceller")
     public ResponseEntity<TaskList> updateTaskList(@PathVariable Long id, @RequestBody TaskList taskList) {
-        if (taskList != null && taskList.getId() != null && taskList.getId().equals(id)) {
+        if (taskList != null && taskList.getId() != null) {
+            if (!taskList.getId().equals(id)) {
+                return ResponseEntity.badRequest().build();
+            }
             TaskList updatedTaskList = taskListService.update(id, taskList);
             if (updatedTaskList != null) {
                 return ResponseEntity.ok(updatedTaskList);
