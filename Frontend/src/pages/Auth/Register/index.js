@@ -1,10 +1,15 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from "../../../store/AuthSlice/authSlice"; // Doğru dosya yolunu kullanın
 import registerSchema from '../Register/validations';
 import { Link } from 'react-router-dom';
 
 const Register = () => {
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.auth);
+
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -16,7 +21,8 @@ const Register = () => {
         },
         validationSchema: registerSchema,
         onSubmit: (values) => {
-            console.log(values);
+            const { confirmPassword, ...userValues } = values; // confirmPassword'ü ayıklıyoruz
+            dispatch(registerUser(userValues));
         },
     });
 
@@ -107,14 +113,14 @@ const Register = () => {
                         helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                         margin="normal"
                     />
-                    <Button color="primary" variant="contained" fullWidth type="submit" style={{ marginTop: '16px' }}>
-                        Kayıt Ol
+                    <Button color="primary" variant="contained" fullWidth type="submit" style={{ marginTop: '16px' }} disabled={loading}>
+                        {loading ? 'Kayıt Olunuyor...' : 'Kayıt Ol'}
                     </Button>
+                    {error && <Typography color="error" variant="body2" style={{ marginTop: '16px' }}>{error}</Typography>}
                 </form>
                 <Typography variant="body2" style={{ marginTop: '16px' }}>
                     Zaten bir hesabınız var mı?{' '}
-
-                    <Link to="/login" >
+                    <Link to="/login">
                         Giriş yap
                     </Link>
                 </Typography>
