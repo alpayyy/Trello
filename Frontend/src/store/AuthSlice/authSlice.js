@@ -1,4 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+const BASE_ENDPOINT = "http://localhost:3001";
 
 const initialState = {
     user: {
@@ -7,8 +10,39 @@ const initialState = {
         userName: "johndoe",
         email: "johndoe@example.com"
     },
-    isAuthenticated: false
+    isAuthenticated: false,
+    loading: false,
+    error: null
 };
+
+export const fetchUser = createAsyncThunk(
+    'user/fetchUser',
+    async (input, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(
+                `${BASE_ENDPOINT}/users/${input.userName}`
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+        }
+    }
+);
+
+export const registerUser = createAsyncThunk(
+    'user/register',
+    async (input, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${BASE_ENDPOINT}/users`,
+                input
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+        }
+    }
+);
 
 const authSlice = createSlice({
     name: 'auth',
@@ -22,6 +56,36 @@ const authSlice = createSlice({
             state.user = null;
             state.isAuthenticated = false;
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.isAuthenticated = true;
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload;
+            })
+            .addCase(registerUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = false;
+            })
+            .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload;
+            });
     },
 });
 
