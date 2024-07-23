@@ -4,11 +4,12 @@ import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser } from "../../../store/AuthSlice/authSlice"; // Doğru dosya yolunu kullanın
 import validationSchema from '../Login/validations';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
+    const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
     const formik = useFormik({
         initialValues: {
@@ -20,6 +21,13 @@ const Login = () => {
             dispatch(fetchUser(values));
         },
     });
+
+    // Giriş başarılı olduğunda ana sayfaya yönlendir
+    React.useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <Container maxWidth="sm">
@@ -74,7 +82,7 @@ const Login = () => {
                 </form>
                 <Typography variant="body2" style={{ marginTop: '16px' }}>
                     Hesabınız yok mu?{' '}
-                    <Link to="/register" >
+                    <Link to="/register">
                         Kayıt ol
                     </Link>
                 </Typography>
