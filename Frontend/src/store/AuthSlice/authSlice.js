@@ -4,20 +4,19 @@ import axios from 'axios';
 const BASE_ENDPOINT = "http://localhost:8080/api";
 
 const initialState = {
-    user: {
-       
-    },
+    user: [],
     isAuthenticated: false,
     loading: false,
     error: null
 };
 
 export const fetchUser = createAsyncThunk(
-    'users/fetchUser',
+    'users/login',
     async (input, { rejectWithValue }) => {
         try {
-            const response = await axios.get(
-                `${BASE_ENDPOINT}/users/${input.userName}`
+            const response = await axios.post(
+                `${BASE_ENDPOINT}/users/login`,
+                input
             );
             return response.data;
         } catch (error) {

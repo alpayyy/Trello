@@ -1,5 +1,5 @@
 package com.example.trello.controller;
-
+import com.example.trello.dto.UserLoginDTO;
 import com.example.trello.dto.UserDTO;
 import com.example.trello.model.User;
 import com.example.trello.service.UserService;
@@ -45,14 +45,14 @@ public class UserController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PostMapping("/login")
+  @PostMapping("/login")
     @Operation(summary = "Kullanıcı giriş yap", description = "Kullanıcı giriş yapar")
-    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
-        User existingUser = userService.findByUsername(userDTO.getUsername());
-        if (existingUser != null && passwordEncoder.matches(userDTO.getPassword(), existingUser.getPassword())) {
-            return ResponseEntity.ok("Login successful");
+    public ResponseEntity<User> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
+        User existingUser = userService.findByUsername(userLoginDTO.getUsername());
+        if (existingUser != null && passwordEncoder.matches(userLoginDTO.getPassword(), existingUser.getPassword())) {
+            return ResponseEntity.ok(existingUser);
         } else {
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(null);
         }
     }
 
