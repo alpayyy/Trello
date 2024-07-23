@@ -14,7 +14,7 @@ const Register = () => {
         initialValues: {
             name: '',
             surname: '',
-            userName: '',
+            username: '',
             email: '',
             password: '',
             confirmPassword: '',
@@ -65,14 +65,14 @@ const Register = () => {
                     />
                     <TextField
                         fullWidth
-                        id="userName"
-                        name="userName"
+                        id="username"
+                        name="username"
                         label="Kullanıcı Adı"
-                        value={formik.values.userName}
+                        value={formik.values.username}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        error={formik.touched.userName && Boolean(formik.errors.userName)}
-                        helperText={formik.touched.userName && formik.errors.userName}
+                        error={formik.touched.username && Boolean(formik.errors.username)}
+                        helperText={formik.touched.username && formik.errors.username}
                         margin="normal"
                     />
                     <TextField

@@ -9,9 +9,10 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Button, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Search, SearchIconWrapper, StyledInputBase } from '../Navbar/style';
-
+import { useSelector } from 'react-redux';
 
 export default function PrimarySearchAppBar() {
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -46,26 +47,32 @@ export default function PrimarySearchAppBar() {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ mr: 5 }}>
-            <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button color="inherit">Login</Button>
-            </Link>
-            <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button color="inherit">Register</Button>
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Button color="inherit">Login</Button>
+                </Link>
+                <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Button color="inherit">Register</Button>
+                </Link>
+              </>
+            ) : null}
           </Box>
           <Box sx={{ display: { md: 'flex', } }}>
-            <Tooltip title="Profile">
-              <IconButton
-                size="large"
-                edge="end"
-                aria-haspopup="true"
-                color="inherit"
-              >
-                <Link to={"/profile"} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <AccountCircle />
-                </Link>
-              </IconButton>
-            </Tooltip>
+            {isAuthenticated ? (
+              <Tooltip title="Profile">
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-haspopup="true"
+                  color="inherit"
+                >
+                  <Link to={"/profile"} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <AccountCircle />
+                  </Link>
+                </IconButton>
+              </Tooltip>
+            ) : null}
           </Box>
         </Toolbar>
       </AppBar>
