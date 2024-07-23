@@ -51,7 +51,6 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
-
     @GetMapping
     @Operation(summary = "Tüm kullanıcıları al", description = "Tüm kullanıcıların listesini alır")
     public ResponseEntity<Object> getAllUsers() {

@@ -12,28 +12,22 @@ import java.util.Optional;
 public class TaskListService {
     @Autowired
     private TaskListRepository taskListRepository;
-
     public TaskList save(TaskList taskList) {
         return taskListRepository.save(taskList);
     }
-
     public List<TaskList> findAll() {
         return taskListRepository.findAll();
     }
-
     public TaskList update(Long id, TaskList taskList) {
         Optional<TaskList> existingTaskList = taskListRepository.findById(id);
         if (existingTaskList.isPresent()) {
             TaskList taskListToUpdate = existingTaskList.get();
-            taskListToUpdate.setName(taskList.getName()); // Update fields as needed
-            // Add other fields to update here
+            taskListToUpdate.setName(taskList.getName());
             return taskListRepository.save(taskListToUpdate);
         } else {
-            return null; // Or throw an exception
+            return null;
         }
-    }
-
-    public boolean delete(Long id) {
+    }public boolean delete(Long id) {
         if (taskListRepository.existsById(id)) {
             taskListRepository.deleteById(id);
             return true;

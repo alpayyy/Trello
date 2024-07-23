@@ -5,5 +5,5 @@ import com.example.trello.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
-    User findByEmail(String email); // E-posta ile sorgulama
+    User findByEmail(String email);
 }
