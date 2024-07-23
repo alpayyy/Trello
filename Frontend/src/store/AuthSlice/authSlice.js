@@ -1,14 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const BASE_ENDPOINT = "http://localhost:3001";
+const BASE_ENDPOINT = "http://localhost:8080/api";
 
 const initialState = {
     user: {
-        firstName: "John",
-        lastName: "Doe",
-        userName: "johndoe",
-        email: "johndoe@example.com"
+       
     },
     isAuthenticated: false,
     loading: false,
@@ -16,7 +13,7 @@ const initialState = {
 };
 
 export const fetchUser = createAsyncThunk(
-    'user/fetchUser',
+    'users/fetchUser',
     async (input, { rejectWithValue }) => {
         try {
             const response = await axios.get(
@@ -34,7 +31,7 @@ export const registerUser = createAsyncThunk(
     async (input, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                `${BASE_ENDPOINT}/users`,
+                `${BASE_ENDPOINT}/users/register`,
                 input
             );
             return response.data;
