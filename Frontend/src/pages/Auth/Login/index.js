@@ -1,18 +1,23 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUser } from "../../../store/AuthSlice/authSlice"; // Doğru dosya yolunu kullanın
 import validationSchema from '../Login/validations';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.auth);
+
     const formik = useFormik({
         initialValues: {
-            userName: '',
+            username: '',
             password: '',
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            console.log(values);
+            dispatch(fetchUser(values));
         },
     });
 
@@ -32,14 +37,14 @@ const Login = () => {
                 <form onSubmit={formik.handleSubmit}>
                     <TextField
                         fullWidth
-                        id="userName"
-                        name="userName"
+                        id="username"
+                        name="username"
                         label="Kullanıcı Adı"
-                        value={formik.values.userName}
+                        value={formik.values.username}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        error={formik.touched.userName && Boolean(formik.errors.userName)}
-                        helperText={formik.touched.userName && formik.errors.userName}
+                        error={formik.touched.username && Boolean(formik.errors.username)}
+                        helperText={formik.touched.username && formik.errors.username}
                         margin="normal"
                     />
                     <TextField
@@ -61,13 +66,14 @@ const Login = () => {
                         fullWidth
                         type="submit"
                         style={{ marginTop: '16px' }}
+                        disabled={loading}
                     >
-                        Giriş Yap
+                        {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                     </Button>
+                    {error && <Typography color="error" variant="body2" style={{ marginTop: '16px' }}>{error}</Typography>}
                 </form>
                 <Typography variant="body2" style={{ marginTop: '16px' }}>
                     Hesabınız yok mu?{' '}
-
                     <Link to="/register" >
                         Kayıt ol
                     </Link>
