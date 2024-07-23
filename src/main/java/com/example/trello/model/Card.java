@@ -2,28 +2,52 @@ package com.example.trello.model;
 
 import jakarta.persistence.*;
 
-
 @Entity
 public class Card {
  @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    private String description;
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
+ private String title;
+ private String description;
 
-   @ManyToOne
-    private TaskList taskList;
+ @ManyToOne
+ @JoinColumn(name = "task_list_id")
+ private TaskList taskList;
 
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+ // Varsayılan yapıcı
+ public Card() {
+ }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+ // Getter ve Setter metodları
+ public Long getId() {
+  return id;
+ }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+ public void setId(Long id) {
+  this.id = id;
+ }
 
-    public TaskList getTaskList() { return taskList; }
-    public void setTaskList(TaskList taskList) { this.taskList = taskList; }
+ public String getTitle() {
+  return title;
+ }
+
+ public void setTitle(String title) {
+  this.title = title;
+ }
+
+ public String getDescription() {
+  return description;
+ }
+
+ public void setDescription(String description) {
+  this.description = description;
+ }
+
+ public TaskList getTaskList() {
+  return taskList;
+ }
+
+ public void setTaskList(TaskList taskList) {
+  this.taskList = taskList;
+ }
 }

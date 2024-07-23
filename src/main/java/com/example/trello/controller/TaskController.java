@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.trello.model.Task;
 import com.example.trello.service.TaskService;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class TaskController {
     @Operation(summary = "Görev oluştur", description = "Yeni bir görev oluşturur")
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         if (task.getTitle() == null || task.getDescription() == null) {
-            return ResponseEntity.badRequest().build(); // or provide a detailed message
+            return ResponseEntity.badRequest().build();
         }
         Task savedTask = taskService.save(task);
         return ResponseEntity.ok(savedTask);
@@ -48,7 +49,7 @@ public class TaskController {
         Optional<Task> existingTask = taskService.findById(id);
         if (existingTask.isPresent()) {
             Task updatedTask = existingTask.get();
-            updatedTask.setTitle(task.getTitle()); // Update with request body values
+            updatedTask.setTitle(task.getTitle());
             updatedTask.setDescription(task.getDescription());
             updatedTask.setCompleted(task.isCompleted());
             return ResponseEntity.ok(taskService.save(updatedTask));

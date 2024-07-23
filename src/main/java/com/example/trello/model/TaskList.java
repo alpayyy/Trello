@@ -15,13 +15,37 @@ public class TaskList {
  @JsonBackReference
  private User user;
 
+ // Varsayılan yapıcı
+ public TaskList() {
+ }
 
- public Long getId() { return id; }
- public void setId(Long id) { this.id = id; }
+ // ID alan yapıcı
+ public TaskList(Long id) {
+  this.id = id;
+ }
 
- public String getName() { return name; }
- public void setName(String name) { this.name = name; }
+ // Getter ve Setter metodları
+ public Long getId() {
+  return id;
+ }
 
- public User getUser() { return user; }
- public void setUser(User user) { this.user = user; }
+ public void setId(Long id) {
+  this.id = id;
+ }
+
+ public String getName() {
+  return name;
+ }
+
+ public void setName(String name) {
+  this.name = name;
+ }
+
+ public User getUser() {
+  return user;
+ }
+
+ public void setUser(User user) {
+  this.user = user;
+ }
 }

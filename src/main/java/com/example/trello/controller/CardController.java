@@ -35,7 +35,6 @@ public class CardController {
         }
     }
 
-
     @GetMapping
     @Operation(summary = "Tüm kartları al", description = "Tüm kartların listesini alır")
     public ResponseEntity<List<Card>> getAllCards() {
