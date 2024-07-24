@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -21,38 +22,43 @@ public class TaskController {
 
     @PostMapping("/card/{cardId}")
     @Operation(summary = "Görev oluştur ve karta ata", description = "Belirtilen karta yeni bir görev oluşturur ve atar")
-    public ResponseEntity<Task> createTaskForCard(@PathVariable Long cardId, @RequestBody Task task) {
+    public ResponseEntity<TaskResponse> createTaskForCard(@PathVariable Long cardId, @RequestBody Task task) {
         if (task.getTitle() == null || task.getDescription() == null) {
             return ResponseEntity.badRequest().build();
         }
         Task savedTask = taskService.assignTaskToCard(cardId, task);
-        return ResponseEntity.ok(savedTask);
+        return ResponseEntity.ok(new TaskResponse(savedTask));
     }
 
     @GetMapping
     @Operation(summary = "Tüm görevleri al", description = "Tüm görevlerin listesini alır")
-    public ResponseEntity<List<Task>> getAllTasks() {
-        return ResponseEntity.ok(taskService.findAll());
+    public ResponseEntity<List<TaskResponse>> getAllTasks() {
+        List<Task> tasks = taskService.findAll();
+        List<TaskResponse> taskResponses = tasks.stream()
+                .map(TaskResponse::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(taskResponses);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "ID ile görev al", description = "Belirtilen ID'ye sahip görevi alır")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
         Optional<Task> task = taskService.findById(id);
-        return task.map(ResponseEntity::ok)
+        return task.map(value -> ResponseEntity.ok(new TaskResponse(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Görevi güncelle", description = "Belirtilen ID'ye sahip görevi günceller")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody Task task) {
         Optional<Task> existingTask = taskService.findById(id);
         if (existingTask.isPresent()) {
             Task updatedTask = existingTask.get();
             updatedTask.setTitle(task.getTitle());
             updatedTask.setDescription(task.getDescription());
             updatedTask.setCompleted(task.isCompleted());
-            return ResponseEntity.ok(taskService.save(updatedTask));
+            Task savedTask = taskService.save(updatedTask);
+            return ResponseEntity.ok(new TaskResponse(savedTask));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -67,5 +73,29 @@ public class TaskController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // TaskResponse iç sınıfı veya ayrı bir dosya olarak
+    public static class TaskResponse {
+        private Long id;
+        private String title;
+        private String description;
+        private boolean completed;
+        private Long cardId;
+
+        public TaskResponse(Task task) {
+            this.id = task.getId();
+            this.title = task.getTitle();
+            this.description = task.getDescription();
+            this.completed = task.isCompleted();
+            this.cardId = task.getCard().getId();
+        }
+
+        // Getters
+        public Long getId() { return id; }
+        public String getTitle() { return title; }
+        public String getDescription() { return description; }
+        public boolean isCompleted() { return completed; }
+        public Long getCardId() { return cardId; }
     }
 }

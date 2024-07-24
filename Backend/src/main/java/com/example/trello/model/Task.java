@@ -1,5 +1,6 @@
 package com.example.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +14,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "card_id")
+    @JsonIgnore // Bu satırı ekliyoruz
     private Card card;
 
     // Getters and setters
