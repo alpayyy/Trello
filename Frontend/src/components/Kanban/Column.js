@@ -3,34 +3,34 @@ import { Paper, Typography, Button, useTheme } from '@mui/material';
 import Task from './Task';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDispatch } from 'react-redux';
-import { addCard, updateCard } from '../../store/KanbanSlice/kanbanSlice';
+import { addTask, updateTask } from '../../store/KanbanSlice/kanbanSlice';
 import CardDialog from './CardDialog';
 
-function Column({ list, cards }) {
+function Column({ list, tasks }) {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
 
-  const handleClickOpen = (card) => {
-    setSelectedCard(card);
+  const handleClickOpen = (task) => {
+    setSelectedTask(task);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setSelectedCard(null);
+    setSelectedTask(null);
   };
 
-  const handleAddCard = (cardData) => {
-    if (cardData.title.trim()) {
-      dispatch(addCard({ listId: list.id, ...cardData }));
+  const handleSaveTask = (taskId, taskData) => {
+    if (taskData.title.trim()) {
+      if (taskId) {
+        dispatch(updateTask({ taskId, ...taskData }));
+      } else {
+        dispatch(addTask({ listId: list.id, ...taskData }));
+      }
       handleClose();
     }
-  };
-
-  const handleUpdateCard = (id, cardData) => {
-    dispatch(updateCard({ cardId: id, ...cardData }));
   };
 
   return (
@@ -49,11 +49,11 @@ function Column({ list, cards }) {
         {list.title}
       </Typography>
 
-      <Droppable droppableId={list.id}>
+      <Droppable droppableId={list.id.toString()}>
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            {cards.map((card, index) => (
-              <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
+            {tasks.map((task, index) => (
+              <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
@@ -61,7 +61,7 @@ function Column({ list, cards }) {
                     {...provided.dragHandleProps}
                     style={{ marginBottom: '8px', ...provided.draggableProps.style }}
                   >
-                    <Task card={card} onCardClick={handleClickOpen} />
+                    <Task task={task} onTaskClick={handleClickOpen} />
                   </div>
                 )}
               </Draggable>
@@ -72,10 +72,10 @@ function Column({ list, cards }) {
       </Droppable>
 
       <Button variant="outlined" style={{ color: '#000000', borderColor: '#000000' }} onClick={() => handleClickOpen(null)}>
-        + Kart ekle
+        + Görev ekle
       </Button>
 
-      <CardDialog open={open} handleClose={handleClose} card={selectedCard} handleAddCard={handleAddCard} handleUpdateCard={handleUpdateCard} />
+      <CardDialog open={open} handleClose={handleClose} card={selectedTask} handleSaveTask={handleSaveTask} />
     </Paper>
   );
 }

@@ -26,6 +26,7 @@ const Login = () => {
     // Giriş başarılı olduğunda ana sayfaya yönlendir
     React.useEffect(() => {
         if (isAuthenticated) {
+            
             navigate('/');
         }
     }, [isAuthenticated, navigate]);
