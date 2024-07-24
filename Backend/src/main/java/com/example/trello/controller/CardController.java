@@ -35,6 +35,13 @@ public class CardController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Kullanıcıya ait kartları al", description = "Belirtilen kullanıcıya ait tüm kartların listesini alır")
+    public ResponseEntity<List<Card>> getCardsByUserId(@PathVariable Long userId) {
+        List<Card> cards = cardService.findByUserId(userId);
+        return ResponseEntity.ok(cards);
+    }
+
     @GetMapping
     @Operation(summary = "Tüm kartları al", description = "Tüm kartların listesini alır")
     public ResponseEntity<List<Card>> getAllCards() {
