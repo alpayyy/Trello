@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 
-function Task({ card, onCardClick }) {
+function Task({ task, onTaskClick }) {
   const handleClickOpen = () => {
-    onCardClick(card);
+    onTaskClick(task);
   };
 
   return (
@@ -12,9 +12,9 @@ function Task({ card, onCardClick }) {
       onClick={handleClickOpen}
     >
       <CardContent>
-        <Typography>{card.title}</Typography>
+        <Typography>{task.title}</Typography>
         <Typography style={{ color: '#A4A4A4', width: '100%' }} variant="body2" component="p">
-          {card.description}
+          {task.description}
         </Typography>
       </CardContent>
     </Card>

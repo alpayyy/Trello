@@ -1,81 +1,98 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-const initialState = {
-  lists: [
-    {
-      id: '1',
-      title: 'Yapılacaklar',
-      cards: [
-        { id: '1', title: 'Proje planlaması', description: '' },
-        { id: '2', title: 'Toplantı başlatma', description: '' },
-        { id: '3', title: 'Dokümantasyon hazırlama', description: '' },
-        { id: '4', title: 'Tasarım incelemesi', description: '' },
-        { id: '5', title: 'Kod gözden geçirme', description: '' },
-      ],
-    },
-    {
-      id: '2',
-      title: 'Yapılıyor',
-      cards: [
-        { id: '6', title: 'Backend geliştirme', description: '' },
-        { id: '7', title: 'Frontend entegrasyonu', description: '' },
-      ],
-    },
-    {
-      id: '3',
-      title: 'Bitti',
-      cards: [
-        { id: '8', title: 'Prototip oluşturma', description: '' },
-        { id: '9', title: 'Veritabanı tasarımı', description: '' },
-      ],
-    },
-    {
-      id: '4',
-      title: 'Test Ediliyor',
-      cards: [
-        { id: '10', title: 'Birim testleri yazma', description: '' },
-        { id: '11', title: 'Entegrasyon testleri', description: '' },
-      ],
-    },
-  ],
-};
+const BASE_ENDPOINT = "http://localhost:8080/api";
+
+export const fetchUserCards = createAsyncThunk(
+  'kanban/fetchUserCards',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_ENDPOINT}/cards/user/${userId}`);
+      console.log("Cards fetched: ", response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
+
+export const addTask = createAsyncThunk(
+  'kanban/addTask',
+  async ({ listId, ...taskData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_ENDPOINT}/tasks/card/${listId}`, taskData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
+
+export const updateTask = createAsyncThunk(
+  'kanban/updateTask',
+  async ({ taskId, ...taskData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${BASE_ENDPOINT}/tasks/${taskId}`, taskData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
+
+export const moveTask = createAsyncThunk(
+  'kanban/moveTask',
+  async ({ source, destination }, { rejectWithValue }) => {
+    try {
+      // Your API call logic for moving the task
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
 
 const kanbanSlice = createSlice({
   name: 'kanban',
-  initialState,
-  reducers: {
-    addCard: (state, action) => {
-      const { listId, title, description } = action.payload;
-      const list = state.lists.find(list => list.id === listId);
-      const newCard = {
-        id: (Math.random() * 10000).toFixed(0), // Random ID for simplicity
-        title,
-        description,
-    
-      };
-      if (list) {
-        list.cards.push(newCard);
-      }
-    },
-    moveCard: (state, action) => {
-      const { source, destination } = action.payload;
-      const sourceListIndex = state.lists.findIndex(list => list.id === source.droppableId);
-      const destinationListIndex = state.lists.findIndex(list => list.id === destination.droppableId);
-      const [movedCard] = state.lists[sourceListIndex].cards.splice(source.index, 1);
-      state.lists[destinationListIndex].cards.splice(destination.index, 0, movedCard);
-    },
-    updateCard: (state, action) => {
-      const { cardId, title, description } = action.payload;
-      state.lists.forEach(list => {
-        const card = list.cards.find(card => card.id === cardId);
-        if (card) {
-          card.title = title;
-          card.description = description;
-        }
-      });
-    },
+  initialState: {
+    lists: [],
+    loading: false,
+    error: null
   },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserCards.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserCards.fulfilled, (state, action) => {
+        state.loading = false;
+        state.lists = action.payload;
+        console.log("Tasks loaded into state: ", state.lists);
+      })
+      .addCase(fetchUserCards.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addTask.fulfilled, (state, action) => {
+        const list = state.lists.find(list => list.id === action.payload.cardId);
+        if (list) {
+          list.tasks.push(action.payload);
+        }
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const list = state.lists.find(list => list.tasks.some(task => task.id === action.payload.id));
+        if (list) {
+          const taskIndex = list.tasks.findIndex(task => task.id === action.payload.id);
+          if (taskIndex > -1) {
+            list.tasks[taskIndex] = action.payload;
+          }
+        }
+      })
+      .addCase(moveTask.fulfilled, (state, action) => {
+        // Update the state based on the result of the move task action
+      });
+  }
 });
 
-export const { addCard, moveCard, updateCard } = kanbanSlice.actions;
 export default kanbanSlice.reducer;

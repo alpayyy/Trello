@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { fetchUserCards } from '../KanbanSlice/kanbanSlice'; // Import the fetchUserCards action
 
 const BASE_ENDPOINT = "http://localhost:8080/api";
 
@@ -12,12 +13,14 @@ const initialState = {
 
 export const fetchUser = createAsyncThunk(
     'users/login',
-    async (input, { rejectWithValue }) => {
+    async (input, { rejectWithValue, dispatch }) => {
         try {
             const response = await axios.post(
                 `${BASE_ENDPOINT}/users/login`,
                 input
             );
+            dispatch(fetchUserCards(response.data.id)); // Dispatch fetchUserCards after login
+            console.log(response.data);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data.error : 'Network error');
@@ -63,11 +66,13 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
+                console.log("User login successful: ", action.payload);
             })
             .addCase(fetchUser.rejected, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload;
+                console.log("User login failed: ", action.payload);
             })
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;
