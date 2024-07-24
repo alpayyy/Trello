@@ -1,7 +1,10 @@
 package com.example.trello.controller;
 
 import com.example.trello.model.TaskList;
+import com.example.trello.model.User;
 import com.example.trello.service.TaskListService;
+import com.example.trello.service.UserService; // Ensure you have a UserService to get User
+import com.example.trello.dto.TaskListDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,24 @@ public class TaskListController {
     @Autowired
     private TaskListService taskListService;
 
+    @Autowired
+    private UserService userService; // Ensure you have a UserService to get User
+
     @PostMapping
     @Operation(summary = "Görev listesi oluştur", description = "Yeni bir görev listesi oluşturur")
-    public ResponseEntity<TaskList> createTaskList(@RequestBody TaskList taskList) {
-        if (taskList != null) {
+    public ResponseEntity<TaskList> createTaskList(@RequestBody TaskListDTO taskListDTO) {
+        if (taskListDTO != null) {
+            // Convert DTO to Entity
+            TaskList taskList = new TaskList();
+            taskList.setName(taskListDTO.getName());
+
+            // Set the User from UserService
+            if (taskListDTO.getUserId() != null) {
+                User user = userService.findById(taskListDTO.getUserId())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                taskList.setUser(user);
+            }
+
             TaskList createdTaskList = taskListService.save(taskList);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
         } else {
