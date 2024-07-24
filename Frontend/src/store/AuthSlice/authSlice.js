@@ -4,7 +4,7 @@ import axios from 'axios';
 const BASE_ENDPOINT = "http://localhost:8080/api";
 
 const initialState = {
-    user: [],
+    user: null,
     isAuthenticated: false,
     loading: false,
     error: null

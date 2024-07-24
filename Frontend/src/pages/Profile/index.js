@@ -1,18 +1,25 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Typography, CircularProgress } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import { Typography, CircularProgress, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProfileContainer, ProfileAvatar, ProfilePaper, ProfileInfoItem } from './style';
+import { logout } from '../../store/AuthSlice/authSlice';
 
 const Profile = () => {
     const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/');
         }
     }, [isAuthenticated, navigate]);
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    };
 
     if (loading) {
         return (
@@ -39,6 +46,9 @@ const Profile = () => {
                 <ProfileInfoItem variant="h6">
                     Soyadı: {user.surname}
                 </ProfileInfoItem>
+                <Button variant="contained" color="primary" onClick={handleLogout}>
+                    Çıkış Yap
+                </Button>
             </ProfilePaper>
         </ProfileContainer>
     );
