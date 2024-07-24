@@ -17,8 +17,9 @@ const Login = () => {
             password: '',
         },
         validationSchema: validationSchema,
-        onSubmit: (values) => {
+        onSubmit: (values, {resetForm}) => {
             dispatch(fetchUser(values));
+            resetForm()
         },
     });
 

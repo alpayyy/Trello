@@ -22,7 +22,6 @@ export default function PrimarySearchAppBar() {
             <Typography
               variant="h6"
               noWrap
-              component="a"
               sx={{
                 mr: 2,
                 display: { md: 'flex' },
