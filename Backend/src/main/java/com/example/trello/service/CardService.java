@@ -22,7 +22,7 @@ public class CardService {
     public Card save(Card card) {
         return cardRepository.save(card);
     }
-    
+
     public List<Card> findByUserId(Long userId) {
         return cardRepository.findByUserId(userId);
     }
@@ -44,7 +44,7 @@ public class CardService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             card.setUser(user);
-            user.setCard(card);
+            user.getCards().add(card);
             return cardRepository.save(card);
         }
         return null;
