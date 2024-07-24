@@ -20,9 +20,10 @@ const Register = () => {
             confirmPassword: '',
         },
         validationSchema: registerSchema,
-        onSubmit: (values) => {
+        onSubmit: (values, {resetForm}) => {
             const { confirmPassword, ...userValues } = values; // confirmPassword'ü ayıklıyoruz
             dispatch(registerUser(userValues));
+            resetForm()
         },
     });
 
