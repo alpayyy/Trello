@@ -1,12 +1,12 @@
 package com.example.trello.controller;
 
+import com.example.trello.model.Task;
+import com.example.trello.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.trello.model.Task;
-import com.example.trello.service.TaskService;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +19,13 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @PostMapping
-    @Operation(summary = "Görev oluştur", description = "Yeni bir görev oluşturur")
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    @PostMapping("/card/{cardId}")
+    @Operation(summary = "Görev oluştur ve karta ata", description = "Belirtilen karta yeni bir görev oluşturur ve atar")
+    public ResponseEntity<Task> createTaskForCard(@PathVariable Long cardId, @RequestBody Task task) {
         if (task.getTitle() == null || task.getDescription() == null) {
             return ResponseEntity.badRequest().build();
         }
-        Task savedTask = taskService.save(task);
+        Task savedTask = taskService.assignTaskToCard(cardId, task);
         return ResponseEntity.ok(savedTask);
     }
 

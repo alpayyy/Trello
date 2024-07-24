@@ -1,6 +1,7 @@
 package com.example.trello.controller;
-import com.example.trello.dto.UserLoginDTO;
+
 import com.example.trello.dto.UserDTO;
+import com.example.trello.dto.UserLoginDTO;
 import com.example.trello.model.User;
 import com.example.trello.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +46,7 @@ public class UserController {
         return ResponseEntity.ok(responseDTO);
     }
 
-  @PostMapping("/login")
+    @PostMapping("/login")
     @Operation(summary = "Kullanıcı giriş yap", description = "Kullanıcı giriş yapar")
     public ResponseEntity<User> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
         User existingUser = userService.findByUsername(userLoginDTO.getUsername());
@@ -58,7 +59,7 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "Tüm kullanıcıları al", description = "Tüm kullanıcıların listesini alır")
-    public ResponseEntity<Object> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.findAll();
         List<UserDTO> userDTOs = users.stream().map(user -> {
             UserDTO userDTO = new UserDTO();
@@ -77,32 +78,29 @@ public class UserController {
     @Operation(summary = "ID ile kullanıcı al", description = "Belirtilen ID'ye sahip kullanıcıyı alır")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
-        if (user.isPresent()) {
+        return user.map(value -> {
             UserDTO userDTO = new UserDTO();
-            userDTO.setId(user.get().getId());
-            userDTO.setUsername(user.get().getUsername());
-            userDTO.setEmail(user.get().getEmail());
-            userDTO.setName(user.get().getName());
-            userDTO.setSurname(user.get().getSurname());
+            userDTO.setId(value.getId());
+            userDTO.setUsername(value.getUsername());
+            userDTO.setEmail(value.getEmail());
+            userDTO.setName(value.getName());
+            userDTO.setSurname(value.getSurname());
             return ResponseEntity.ok(userDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Kullanıcıyı güncelle", description = "Belirtilen ID'ye sahip kullanıcıyı günceller")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        Optional<User> existingUser = userService.findById(id);
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
+        Optional<User> userOptional = userService.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
             user.setUsername(userDTO.getUsername());
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             user.setEmail(userDTO.getEmail());
             user.setName(userDTO.getName());
             user.setSurname(userDTO.getSurname());
-            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Şifreyi şifrele
-            }
+
             User updatedUser = userService.save(user);
             UserDTO responseDTO = new UserDTO();
             responseDTO.setId(updatedUser.getId());
@@ -110,6 +108,7 @@ public class UserController {
             responseDTO.setEmail(updatedUser.getEmail());
             responseDTO.setName(updatedUser.getName());
             responseDTO.setSurname(updatedUser.getSurname());
+
             return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.notFound().build();
@@ -119,7 +118,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Kullanıcıyı sil", description = "Belirtilen ID'ye sahip kullanıcıyı siler")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (userService.findById(id).isPresent()) {
+        Optional<User> userOptional = userService.findById(id);
+        if (userOptional.isPresent()) {
             userService.deleteById(id);
             return ResponseEntity.noContent().build();
         } else {

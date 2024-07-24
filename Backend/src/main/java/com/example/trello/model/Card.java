@@ -1,6 +1,8 @@
 package com.example.trello.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Card {
@@ -8,46 +10,25 @@ public class Card {
  @GeneratedValue(strategy = GenerationType.IDENTITY)
  private Long id;
  private String title;
- private String description;
 
- @ManyToOne
- @JoinColumn(name = "task_list_id")
- private TaskList taskList;
+ @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+ private Set<Task> tasks;
 
- // Varsayılan yapıcı
- public Card() {
- }
+ @OneToOne
+ @JoinColumn(name = "user_id")
+ @JsonBackReference
+ private User user;
 
- // Getter ve Setter metodları
- public Long getId() {
-  return id;
- }
+ // Getters and setters
+ public Long getId() { return id; }
+ public void setId(Long id) { this.id = id; }
 
- public void setId(Long id) {
-  this.id = id;
- }
+ public String getTitle() { return title; }
+ public void setTitle(String title) { this.title = title; }
 
- public String getTitle() {
-  return title;
- }
+ public Set<Task> getTasks() { return tasks; }
+ public void setTasks(Set<Task> tasks) { this.tasks = tasks; }
 
- public void setTitle(String title) {
-  this.title = title;
- }
-
- public String getDescription() {
-  return description;
- }
-
- public void setDescription(String description) {
-  this.description = description;
- }
-
- public TaskList getTaskList() {
-  return taskList;
- }
-
- public void setTaskList(TaskList taskList) {
-  this.taskList = taskList;
- }
+ public User getUser() { return user; }
+ public void setUser(User user) { this.user = user; }
 }

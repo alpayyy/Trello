@@ -13,11 +13,11 @@ public class User {
     private String password;
     private String email;
     private String name;
-    private  String surname;
+    private String surname;
 
-    @OneToMany(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Set<TaskList> taskLists;
+    private Card card;
 
     // Getters and setters
     public Long getId() { return id; }
@@ -31,22 +31,12 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getSurname() { return surname; }
+    public void setSurname(String surname) { this.surname = surname; }
 
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public Set<TaskList> getTaskLists() { return taskLists; }
-    public void setTaskLists(Set<TaskList> taskLists) { this.taskLists = taskLists; }
+    public Card getCard() { return card; }
+    public void setCard(Card card) { this.card = card; }
 }

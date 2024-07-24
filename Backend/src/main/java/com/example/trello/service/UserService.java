@@ -18,19 +18,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
