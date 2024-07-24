@@ -22,6 +22,10 @@ public class CardService {
     public Card save(Card card) {
         return cardRepository.save(card);
     }
+    
+    public List<Card> findByUserId(Long userId) {
+        return cardRepository.findByUserId(userId);
+    }
 
     public List<Card> findAll() {
         return cardRepository.findAll();
