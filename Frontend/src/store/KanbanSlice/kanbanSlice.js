@@ -8,7 +8,6 @@ export const fetchUserCards = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${BASE_ENDPOINT}/cards/user/${userId}`);
-      console.log("Cards fetched: ", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data.error : 'Network error');
@@ -42,9 +41,14 @@ export const updateTask = createAsyncThunk(
 
 export const moveTask = createAsyncThunk(
   'kanban/moveTask',
-  async ({ source, destination }, { rejectWithValue }) => {
+  async ({ taskId, sourceCardId, destinationCardId }, { rejectWithValue }) => {
     try {
-      // Your API call logic for moving the task
+      const response = await axios.put(`${BASE_ENDPOINT}/tasks/move`, {
+        taskId,
+        sourceCardId,
+        destinationCardId
+      });
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data.error : 'Network error');
     }
@@ -58,7 +62,14 @@ const kanbanSlice = createSlice({
     loading: false,
     error: null
   },
-  reducers: {},
+  reducers: {
+    updateList: (state, action) => {
+      const listIndex = state.lists.findIndex(list => list.id === action.payload.id);
+      if (listIndex > -1) {
+        state.lists[listIndex] = action.payload;
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserCards.pending, (state) => {
@@ -68,7 +79,6 @@ const kanbanSlice = createSlice({
       .addCase(fetchUserCards.fulfilled, (state, action) => {
         state.loading = false;
         state.lists = action.payload;
-        console.log("Tasks loaded into state: ", state.lists);
       })
       .addCase(fetchUserCards.rejected, (state, action) => {
         state.loading = false;
@@ -90,9 +100,21 @@ const kanbanSlice = createSlice({
         }
       })
       .addCase(moveTask.fulfilled, (state, action) => {
-        // Update the state based on the result of the move task action
+        const { id, cardId } = action.payload;
+        const sourceList = state.lists.find(list => list.tasks.some(task => task.id === id));
+        const destinationList = state.lists.find(list => list.id === cardId);
+
+        if (sourceList && destinationList) {
+          const task = sourceList.tasks.find(task => task.id === id);
+          if (task) {
+            sourceList.tasks = sourceList.tasks.filter(task => task.id !== id);
+            destinationList.tasks.push(task);
+          }
+        }
       });
   }
 });
+
+export const { updateList } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;

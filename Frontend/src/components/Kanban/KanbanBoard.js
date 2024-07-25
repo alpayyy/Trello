@@ -26,13 +26,36 @@ function KanbanBoard() {
   }, [user, dispatch]);
 
   const onDragEnd = (result) => {
-    const { source, destination } = result;
+    const { source, destination, draggableId } = result;
 
     if (!destination) {
       return;
     }
 
-    dispatch(moveTask({ source, destination }));
+    if (source.droppableId === destination.droppableId) {
+      // Aynı sütun içinde sıralama
+      const list = lists.find(list => list.id.toString() === source.droppableId);
+      const updatedTasks = Array.from(list.tasks);
+      const [movedTask] = updatedTasks.splice(source.index, 1);
+      updatedTasks.splice(destination.index, 0, movedTask);
+
+      const updatedList = {
+        ...list,
+        tasks: updatedTasks,
+      };
+
+      dispatch({
+        type: 'kanban/updateList',
+        payload: updatedList
+      });
+    } else {
+      // Farklı sütunlar arasında taşıma
+      dispatch(moveTask({
+        taskId: draggableId,
+        sourceCardId: source.droppableId,
+        destinationCardId: destination.droppableId
+      }));
+    }
   };
 
   return (
