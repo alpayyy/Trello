@@ -62,7 +62,14 @@ const kanbanSlice = createSlice({
     loading: false,
     error: null
   },
-  reducers: {},
+  reducers: {
+    updateList: (state, action) => {
+      const listIndex = state.lists.findIndex(list => list.id === action.payload.id);
+      if (listIndex > -1) {
+        state.lists[listIndex] = action.payload;
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserCards.pending, (state) => {
@@ -107,5 +114,7 @@ const kanbanSlice = createSlice({
       });
   }
 });
+
+export const { updateList } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;
