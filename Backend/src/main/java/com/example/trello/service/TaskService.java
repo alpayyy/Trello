@@ -44,4 +44,24 @@ public class TaskService {
         }
         return null;
     }
+    public Task updateTaskCard(Long taskId, Long newCardId) {
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        Optional<Card> cardOptional = cardRepository.findById(newCardId);
+
+        if (taskOptional.isPresent() && cardOptional.isPresent()) {
+            Task task = taskOptional.get();
+            Card newCard = cardOptional.get();
+            task.setCard(newCard);
+            return taskRepository.save(task);
+        } else {
+            if (!taskOptional.isPresent()) {
+                System.out.println("Task not found with ID: " + taskId);
+            }
+            if (!cardOptional.isPresent()) {
+                System.out.println("Card not found with ID: " + newCardId);
+            }
+            return null;
+        }
+    }
+
 }

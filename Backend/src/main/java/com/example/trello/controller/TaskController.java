@@ -64,6 +64,17 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/{taskId}/card/{cardId}")
+    @Operation(summary = "Görevin kartını güncelle", description = "Belirtilen görevin kartını günceller")
+    public ResponseEntity<TaskResponse> updateTaskCard(@PathVariable Long taskId, @PathVariable Long cardId) {
+        Task updatedTask = taskService.updateTaskCard(taskId, cardId);
+        if (updatedTask != null) {
+            return ResponseEntity.ok(new TaskResponse(updatedTask));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Görevi sil", description = "Belirtilen ID'ye sahip görevi siler")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {

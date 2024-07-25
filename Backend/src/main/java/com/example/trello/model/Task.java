@@ -14,7 +14,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "card_id")
-    @JsonIgnore // Bu satırı ekliyoruz
+    @JsonIgnore
     private Card card;
 
     // Getters and setters
