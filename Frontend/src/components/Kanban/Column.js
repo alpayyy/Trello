@@ -52,7 +52,7 @@ function Column({ list, tasks }) {
       <Droppable droppableId={list.id.toString()}>
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            {tasks.map((task, index) => (
+            {tasks && tasks.map((task, index) => (
               <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                 {(provided) => (
                   <div

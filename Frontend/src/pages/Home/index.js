@@ -3,16 +3,20 @@ import KanbanBoard from "../../components/Kanban/KanbanBoard";
 import { Container, Typography, Button, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import AddCard from '../../components/AddCard';
 
 function Home() {
   const lists = useSelector((state) => state.kanban.lists);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
 
   return (
     <Container>
       {isAuthenticated ? (
+        <Box>
         <KanbanBoard lists={lists} />
+        <AddCard userId={user.id}></AddCard>
+        </Box>
       ) : (
         <Box sx={{
           marginTop: 15,

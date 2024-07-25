@@ -55,6 +55,18 @@ export const moveTask = createAsyncThunk(
   }
 );
 
+export const createCardForUser = createAsyncThunk(
+  'kanban/createCardForUser',
+  async ({ userId, title }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_ENDPOINT}/cards/user/${userId}`, { title });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
+
 const kanbanSlice = createSlice({
   name: 'kanban',
   initialState: {
@@ -87,6 +99,7 @@ const kanbanSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action) => {
         const list = state.lists.find(list => list.id === action.payload.cardId);
         if (list) {
+          if (!list.tasks) list.tasks = []; // Ensure tasks is always an array
           list.tasks.push(action.payload);
         }
       })
@@ -108,9 +121,16 @@ const kanbanSlice = createSlice({
           const task = sourceList.tasks.find(task => task.id === id);
           if (task) {
             sourceList.tasks = sourceList.tasks.filter(task => task.id !== id);
+            if (!destinationList.tasks) destinationList.tasks = []; // Ensure tasks is always an array
             destinationList.tasks.push(task);
           }
         }
+      })
+      .addCase(createCardForUser.fulfilled, (state, action) => {
+        state.lists.push({
+          ...action.payload,
+          tasks: [] // Initialize tasks as an empty array for new cards
+        });
       });
   }
 });
