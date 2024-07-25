@@ -4,9 +4,12 @@ import { fetchUserCards } from '../KanbanSlice/kanbanSlice'; // Import the fetch
 
 const BASE_ENDPOINT = "http://localhost:8080/api";
 
+// Local storage'dan kullanıcıyı al
+const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
 const initialState = {
-    user: null,
-    isAuthenticated: false,
+    user: storedUser,
+    isAuthenticated: !!storedUser,
     loading: false,
     error: null
 };
@@ -50,10 +53,12 @@ const authSlice = createSlice({
         login: (state, action) => {
             state.user = action.payload;
             state.isAuthenticated = true;
+            localStorage.setItem('user', JSON.stringify(action.payload));
         },
         logout: (state) => {
             state.user = null;
             state.isAuthenticated = false;
+            localStorage.removeItem('user');
         },
     },
     extraReducers: (builder) => {
@@ -66,6 +71,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
+                localStorage.setItem('user', JSON.stringify(action.payload));
                 console.log("User login successful: ", action.payload);
             })
             .addCase(fetchUser.rejected, (state, action) => {
