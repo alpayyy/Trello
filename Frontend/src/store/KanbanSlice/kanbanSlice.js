@@ -38,7 +38,30 @@ export const updateTask = createAsyncThunk(
     }
   }
 );
+export const deleteCard = createAsyncThunk(
+  'kanban/deleteCard',
+  async (cardId, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${BASE_ENDPOINT}/cards/${cardId}`);
+      return cardId;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
 
+export const updateCardTitle = createAsyncThunk(
+  'kanban/updateCardTitle',
+  async ({ cardId, title }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${BASE_ENDPOINT}/cards/${cardId}`, { title });
+      console.log('response.data', response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
 export const moveTask = createAsyncThunk(
   'kanban/moveTask',
   async ({ taskId, sourceCardId, destinationCardId }, { rejectWithValue }) => {
@@ -131,6 +154,15 @@ const kanbanSlice = createSlice({
           ...action.payload,
           tasks: [] // Initialize tasks as an empty array for new cards
         });
+      })
+      .addCase(deleteCard.fulfilled, (state, action) => {
+        state.lists = state.lists.filter(list => list.id !== action.payload);
+      })
+      .addCase(updateCardTitle.fulfilled, (state, action) => {
+        const listIndex = state.lists.findIndex(list => list.id === action.payload.id);
+        if (listIndex > -1) {
+          state.lists[listIndex].title = action.payload.title;
+        }
       });
   }
 });

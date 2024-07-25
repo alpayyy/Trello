@@ -6,7 +6,6 @@ import { createCardForUser, fetchUserCards } from '../store/KanbanSlice/kanbanSl
 const AddCard = ({ userId }) => {
     const [cardName, setCardName] = useState('');
     const dispatch = useDispatch();
-    const { user } = useSelector((state) => state.auth);
 
 
     const handleSubmit = (e) => {
@@ -15,7 +14,6 @@ const AddCard = ({ userId }) => {
             dispatch(createCardForUser({ userId, title: cardName }));
             setCardName('');
         }
-        dispatch(fetchUserCards(user.id));
     };
 
     return (

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Paper, Typography, Button, useTheme } from '@mui/material';
+import { Paper, Button, useTheme, IconButton } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 import Task from './Task';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDispatch } from 'react-redux';
-import { addTask, updateTask } from '../../store/KanbanSlice/kanbanSlice';
+import { addTask, updateTask, deleteCard } from '../../store/KanbanSlice/kanbanSlice';
 import CardDialog from './CardDialog';
+import UpdateCard from '../UpdateCard';
 
 function Column({ list, tasks }) {
   const theme = useTheme();
@@ -33,6 +35,10 @@ function Column({ list, tasks }) {
     }
   };
 
+  const handleDeleteClick = () => {
+    dispatch(deleteCard(list.id));
+  };
+
   return (
     <Paper
       elevation={5}
@@ -45,9 +51,12 @@ function Column({ list, tasks }) {
         height: 'auto',
       }}
     >
-      <Typography style={{ color: theme.palette.customBlack.main }} variant="h6" gutterBottom>
-        {list.title}
-      </Typography>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <UpdateCard list={list} />
+        <IconButton onClick={handleDeleteClick} size="small">
+          <Delete fontSize="small" />
+        </IconButton>
+      </div>
 
       <Droppable droppableId={list.id.toString()}>
         {(provided) => (
