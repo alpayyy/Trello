@@ -2,7 +2,7 @@ package com.example.trello.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 public class Card {
@@ -12,8 +12,8 @@ public class Card {
 
     private String title;
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Task> tasks;
+   @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -27,8 +27,8 @@ public class Card {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public Set<Task> getTasks() { return tasks; }
-    public void setTasks(Set<Task> tasks) { this.tasks = tasks; }
+    public List<Task> getTasks() { return tasks; }
+    public void setTasks(List<Task> tasks) { this.tasks = tasks; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
