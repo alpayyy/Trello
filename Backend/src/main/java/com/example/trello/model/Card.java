@@ -31,4 +31,17 @@ public class Card {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    // Getter for userId
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
+    // Setter for userId
+    public void setUserId(Long userId) {
+        if (this.user == null) {
+            this.user = new User();
+        }
+        this.user.setId(userId);
+    }
 }

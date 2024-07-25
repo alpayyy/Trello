@@ -56,18 +56,19 @@ public class CardController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Kartı güncelle", description = "Belirtilen ID'ye sahip kartı günceller")
-    public ResponseEntity<Card> updateCard(@PathVariable Long id, @RequestBody Card card) {
-        Optional<Card> existingCard = cardService.findById(id);
-        if (existingCard.isPresent()) {
-            card.setId(id);
-            Card updatedCard = cardService.save(card);
-            return ResponseEntity.ok(updatedCard);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+@PutMapping("/{id}")
+@Operation(summary = "Kartı güncelle", description = "Belirtilen ID'ye sahip kartı günceller")
+public ResponseEntity<Card> updateCard(@PathVariable Long id, @RequestBody Card card) {
+    Optional<Card> existingCard = cardService.findById(id);
+    if (existingCard.isPresent()) {
+        card.setId(id);
+        card.setUserId(existingCard.get().getUserId()); // Ensure userId is included
+        Card updatedCard = cardService.save(card);
+        return ResponseEntity.ok(updatedCard);
+    } else {
+        return ResponseEntity.notFound().build();
     }
+}
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Kartı sil", description = "Belirtilen ID'ye sahip kartı siler")

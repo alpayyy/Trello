@@ -61,7 +61,7 @@ function KanbanBoard() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <StyledColumns>
-        {lists && lists.map((list) => (
+        {lists.map((list) => (
           <Column key={list.id} list={list} tasks={list.tasks} />
         ))}
       </StyledColumns>
