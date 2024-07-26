@@ -33,7 +33,7 @@ function KanbanBoard() {
     }
 
     if (source.droppableId === destination.droppableId) {
-      // Aynı sütun içinde sıralama
+
       const list = lists.find(list => list.id.toString() === source.droppableId);
       const updatedTasks = Array.from(list.tasks);
       const [movedTask] = updatedTasks.splice(source.index, 1);
@@ -49,7 +49,6 @@ function KanbanBoard() {
         payload: updatedList
       });
     } else {
-      // Farklı sütunlar arasında taşıma
       dispatch(moveTask({
         taskId: draggableId,
         sourceCardId: source.droppableId,

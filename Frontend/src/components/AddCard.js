@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Input } from '@mui/material';
-import { createCardForUser, fetchUserCards } from '../store/KanbanSlice/kanbanSlice'; // Make sure the action is correctly imported
-
+import { useDispatch } from 'react-redux';
+import { Box, Button, Paper, Input } from '@mui/material';
+import { createCardForUser } from '../store/KanbanSlice/kanbanSlice';
 const AddCard = ({ userId }) => {
     const [cardName, setCardName] = useState('');
     const dispatch = useDispatch();
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -17,13 +15,23 @@ const AddCard = ({ userId }) => {
     };
 
     return (
-        <Box
+        <Paper
             component="form"
             onSubmit={handleSubmit}
             sx={{
+                padding: '16px',
+                backgroundColor: 'secondary.main',
+                color: '#FFFFFF',
+                width: '100%',
+                maxWidth: '200px',
+                maxHeight: '100px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                gap:"16px" ,
+                margin: '10vh auto',
+                justifyContent:"center",
+
             }}
         >
             <Input
@@ -31,16 +39,23 @@ const AddCard = ({ userId }) => {
                 placeholder='Card name'
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
+                sx={{
+                    backgroundColor: 'white',
+                    marginBottom: '8px',
+                    width: '100%',
+                    padding: '8px',
+                    borderRadius: '4px',
+                }}
             />
             <Button
-                sx={{ marginTop: "5px" }}
                 variant="contained"
-                color="primary"
+                color="secondary"
                 type="submit"
+                sx={{ width: '100%', border: "1px solid " }}
             >
-                Add Card
+                Kart Ekle
             </Button>
-        </Box>
+        </Paper>
     );
 }
 

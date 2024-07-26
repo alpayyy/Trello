@@ -11,9 +11,9 @@ function Home() {
 
 
   return (
-    <Container>
+    <Container >
       {isAuthenticated ? (
-        <Box>
+        <Box >
         <KanbanBoard lists={lists} />
         <AddCard userId={user.id}></AddCard>
         </Box>
