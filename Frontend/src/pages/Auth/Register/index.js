@@ -2,13 +2,14 @@ import React from 'react';
 import { useFormik } from 'formik';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from "../../../store/AuthSlice/authSlice"; // Doğru dosya yolunu kullanın
+import { registerUser } from "../../../store/AuthSlice/authSlice";
 import registerSchema from '../Register/validations';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -21,9 +22,10 @@ const Register = () => {
         },
         validationSchema: registerSchema,
         onSubmit: (values, {resetForm}) => {
-            const { confirmPassword, ...userValues } = values; // confirmPassword'ü ayıklıyoruz
+            const { confirmPassword, ...userValues } = values;
             dispatch(registerUser(userValues));
             resetForm()
+            navigate('/login');
         },
     });
 

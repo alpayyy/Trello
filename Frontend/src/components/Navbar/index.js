@@ -49,10 +49,10 @@ export default function PrimarySearchAppBar() {
             {!isAuthenticated ? (
               <>
                 <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Button color="inherit">Login</Button>
+                  <Button color="inherit">Giriş Yap</Button>
                 </Link>
                 <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Button color="inherit">Register</Button>
+                  <Button color="inherit">Kayıt Ol</Button>
                 </Link>
               </>
             ) : null}
