@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Button } from '@mui/material';
-
+import { useDispatch } from 'react-redux';
+import { deleteTask } from "../../store/KanbanSlice/kanbanSlice"
 function CardDialog({ open, handleClose, card, handleSaveTask }) {
   const [cardTitle, setCardTitle] = useState('');
   const [cardDescription, setCardDescription] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (card) {
@@ -21,7 +23,16 @@ function CardDialog({ open, handleClose, card, handleSaveTask }) {
       description: cardDescription,
     };
     handleSaveTask(card ? card.id : null, cardData);
+    setCardTitle(''); // Form alanını temizlemek için eklenmiştir
+    setCardDescription(''); // Form alanını temizlemek için eklenmiştir
     handleClose();
+  };
+
+  const handleDelete = () => {
+    if (card) {
+      dispatch(deleteTask(card.id));
+      handleClose();
+    }
   };
 
   return (
@@ -50,12 +61,19 @@ function CardDialog({ open, handleClose, card, handleSaveTask }) {
         />
       </DialogContent>
       <DialogActions>
+      
+      {card && (
+          <Button style={{backgroundColor:"red", color:"white"}} onClick={handleDelete} >
+            Görevi Sil
+          </Button>
+        )}
         <Button onClick={handleClose} color="primary">
           İptal
         </Button>
         <Button onClick={handleSave} color="primary">
           {card ? 'Güncelle' : 'Ekle'}
         </Button>
+        
       </DialogActions>
     </Dialog>
   );
