@@ -38,6 +38,18 @@ export const updateTask = createAsyncThunk(
     }
   }
 );
+export const deleteTask = createAsyncThunk(
+  'kanban/deleteTask',
+  async (taskId, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${BASE_ENDPOINT}/tasks/${taskId}`);
+      return taskId;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
+
 export const deleteCard = createAsyncThunk(
   'kanban/deleteCard',
   async (cardId, { rejectWithValue }) => {
@@ -162,6 +174,12 @@ const kanbanSlice = createSlice({
         const listIndex = state.lists.findIndex(list => list.id === action.payload.id);
         if (listIndex > -1) {
           state.lists[listIndex].title = action.payload.title;
+        }
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const list = state.lists.find(list => list.tasks.some(task => task.id === action.payload));
+        if (list) {
+          list.tasks = list.tasks.filter(task => task.id !== action.payload);
         }
       });
   }
