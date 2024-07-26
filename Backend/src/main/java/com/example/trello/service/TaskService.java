@@ -7,8 +7,10 @@ import com.example.trello.repository.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -35,15 +37,6 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public Task assignTaskToCard(Long cardId, Task task) {
-        Optional<Card> cardOpt = cardRepository.findById(cardId);
-        if (cardOpt.isPresent()) {
-            Card card = cardOpt.get();
-            task.setCard(card);
-            return taskRepository.save(task);
-        }
-        return null;
-    }
     public Task updateTaskCard(Long taskId, Long newCardId) {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         Optional<Card> cardOptional = cardRepository.findById(newCardId);
@@ -64,4 +57,42 @@ public class TaskService {
         }
     }
 
+    public void updateTaskOrdersAfterRemoval(Card card, Task removedTask) {
+    List<Task> tasks = card.getTasks().stream()
+        .filter(t -> !t.getId().equals(removedTask.getId()))
+        .sorted(Comparator.comparingInt(Task::getTaskOrder))
+        .collect(Collectors.toList());
+    for (int i = 0; i < tasks.size(); i++) {
+        tasks.get(i).setTaskOrder(i);
+        taskRepository.save(tasks.get(i));
+    }
+}
+
+public void updateTaskOrdersAfterInsertion(Card card, Task insertedTask, int newOrder) {
+    List<Task> tasks = card.getTasks().stream()
+        .filter(t -> !t.getId().equals(insertedTask.getId()))
+        .sorted(Comparator.comparingInt(Task::getTaskOrder))
+        .collect(Collectors.toList());
+
+    for (int i = tasks.size(); i > newOrder; i--) {
+        tasks.get(i - 1).setTaskOrder(i);
+        taskRepository.save(tasks.get(i - 1));
+    }
+}
+public Task assignTaskToCard(Long cardId, Task task) {
+    Optional<Card> cardOpt = cardRepository.findById(cardId);
+    if (cardOpt.isPresent()) {
+        Card card = cardOpt.get();
+        task.setCard(card);
+
+        int maxOrder = card.getTasks().stream()
+            .mapToInt(Task::getTaskOrder)
+            .max()
+            .orElse(-1);
+        task.setTaskOrder(maxOrder + 1);
+
+        return taskRepository.save(task);
+    }
+    return null;
+}
 }

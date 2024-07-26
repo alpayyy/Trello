@@ -61,20 +61,23 @@ function Column({ list, tasks }) {
       <Droppable droppableId={list.id.toString()}>
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            {tasks && tasks.map((task, index) => (
-              <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{ marginBottom: '8px', ...provided.draggableProps.style }}
-                  >
-                    <Task task={task} onTaskClick={handleClickOpen} />
-                  </div>
-                )}
-              </Draggable>
-            ))}
+            {tasks && tasks
+              .slice()  // Array'in kopyasını almak için slice() kullanın
+              .sort((a, b) => a.taskOrder - b.taskOrder)
+              .map((task, index) => (
+                <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{ marginBottom: '8px', ...provided.draggableProps.style }}
+                    >
+                      <Task task={task} onTaskClick={handleClickOpen} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
             {provided.placeholder}
           </div>
         )}

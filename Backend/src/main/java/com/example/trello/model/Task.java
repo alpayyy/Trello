@@ -11,6 +11,7 @@ public class Task {
     private String title;
     private String description;
     private boolean completed;
+    private int taskOrder;
 
     @ManyToOne
     @JoinColumn(name = "card_id")
@@ -29,6 +30,9 @@ public class Task {
 
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+
+    public int getTaskOrder() { return taskOrder; }
+    public void setTaskOrder(int taskOrder) { this.taskOrder = taskOrder; }
 
     public Card getCard() { return card; }
     public void setCard(Card card) { this.card = card; }
