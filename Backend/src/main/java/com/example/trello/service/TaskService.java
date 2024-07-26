@@ -95,4 +95,19 @@ public Task assignTaskToCard(Long cardId, Task task) {
     }
     return null;
 }
+ public void updateTaskOrdersWithinColumn(Card card, Long taskId, int newOrder) {
+        List<Task> tasks = card.getTasks().stream()
+            .sorted(Comparator.comparingInt(Task::getTaskOrder))
+            .collect(Collectors.toList());
+
+        Task movedTask = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst().orElse(null);
+        if (movedTask != null) {
+            tasks.remove(movedTask);
+            tasks.add(newOrder, movedTask);
+            for (int i = 0; i < tasks.size(); i++) {
+                tasks.get(i).setTaskOrder(i);
+                taskRepository.save(tasks.get(i));
+            }
+        }
+    }
 }
