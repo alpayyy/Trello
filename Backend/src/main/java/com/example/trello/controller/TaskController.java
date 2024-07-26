@@ -90,7 +90,7 @@ public class TaskController {
         }
     }
 
-  @PutMapping("/move")
+   @PutMapping("/move")
     @Operation(summary = "Görevi taşı", description = "Bir görevi bir karttan başka bir karta taşır")
     public ResponseEntity<TaskResponse> moveTask(@RequestBody MoveTaskRequest moveTaskRequest) {
         Optional<Task> taskOpt = taskService.findById(moveTaskRequest.getTaskId());
@@ -102,20 +102,26 @@ public class TaskController {
             Card sourceCard = sourceCardOpt.get();
             Card destinationCard = destinationCardOpt.get();
 
-            // Update source card task orders
-            taskService.updateTaskOrdersAfterRemoval(sourceCard, task);
+            if (moveTaskRequest.getSourceCardId().equals(moveTaskRequest.getDestinationCardId())) {
+                // Same column, reorder tasks within the same column
+                taskService.updateTaskOrdersWithinColumn(destinationCard, moveTaskRequest.getTaskId(), moveTaskRequest.getNewOrder());
+            } else {
+                // Different columns, move and reorder tasks
+                taskService.updateTaskOrdersAfterRemoval(sourceCard, task);
+                taskService.updateTaskOrdersAfterInsertion(destinationCard, task, moveTaskRequest.getNewOrder());
 
-            // Update destination card task orders
-            taskService.updateTaskOrdersAfterInsertion(destinationCard, task, moveTaskRequest.getNewOrder());
+                task.setCard(destinationCard);
+                task.setTaskOrder(moveTaskRequest.getNewOrder());
+                taskService.save(task);
+            }
 
-            task.setCard(destinationCard);
-            task.setTaskOrder(moveTaskRequest.getNewOrder());
             Task savedTask = taskService.save(task);
             return ResponseEntity.ok(new TaskResponse(savedTask));
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     // MoveTaskRequest sınıfı veya iç sınıfı
     public static class MoveTaskRequest {

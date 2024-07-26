@@ -96,6 +96,27 @@ export const moveTask = createAsyncThunk(
     }
   }
 );
+export const reorderTasksWithinColumn = createAsyncThunk(
+  'kanban/reorderTasksWithinColumn',
+  async ({ cardId, taskId, newOrder }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const response = await axios.put(`${BASE_ENDPOINT}/tasks/move`, {
+        taskId,
+        sourceCardId: cardId,
+        destinationCardId: cardId,
+        newOrder
+      });
+
+      // Veritabanından task'ları tekrar fetch et
+      const userId = getState().auth.user.id;
+      await dispatch(fetchUserCards(userId));
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+    }
+  }
+);
 
 export const createCardForUser = createAsyncThunk(
   'kanban/createCardForUser',
@@ -160,6 +181,9 @@ const kanbanSlice = createSlice({
         }
       })
       .addCase(moveTask.fulfilled, (state, action) => {
+        // Task'ları fetchUserCards ile yenileme işlemi yapılacağı için burada işlem yapmaya gerek yok
+      })
+      .addCase(reorderTasksWithinColumn.fulfilled, (state, action) => {
         // Task'ları fetchUserCards ile yenileme işlemi yapılacağı için burada işlem yapmaya gerek yok
       })
       .addCase(createCardForUser.fulfilled, (state, action) => {

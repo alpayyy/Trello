@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { styled } from '@mui/system';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserCards, moveTask, updateList } from '../../store/KanbanSlice/kanbanSlice';
+import { fetchUserCards, moveTask, reorderTasksWithinColumn, updateList } from '../../store/KanbanSlice/kanbanSlice';
 import Column from './Column';
 
 const StyledColumns = styled('div')({
@@ -33,17 +33,11 @@ function KanbanBoard() {
     }
 
     if (source.droppableId === destination.droppableId) {
-      const list = lists.find(list => list.id.toString() === source.droppableId);
-      const updatedTasks = Array.from(list.tasks);
-      const [movedTask] = updatedTasks.splice(source.index, 1);
-      updatedTasks.splice(destination.index, 0, movedTask);
-
-      const updatedList = {
-        ...list,
-        tasks: updatedTasks.map((task, index) => ({ ...task, taskOrder: index })),
-      };
-
-      dispatch(updateList(updatedList));
+      dispatch(reorderTasksWithinColumn({
+        cardId: source.droppableId,
+        taskId: draggableId,
+        newOrder: destination.index
+      }));
     } else {
       dispatch(moveTask({
         taskId: draggableId,
