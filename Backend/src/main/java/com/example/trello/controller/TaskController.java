@@ -1,4 +1,5 @@
 package com.example.trello.controller;
+
 import com.example.trello.model.Card;
 import com.example.trello.model.Task;
 import com.example.trello.service.TaskService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/tasks")
 @Tag(name = "tasks", description = "Görev API'si")
@@ -32,7 +34,6 @@ public class TaskController {
         Task savedTask = taskService.assignTaskToCard(cardId, task);
         return ResponseEntity.ok(new TaskResponse(savedTask));
     }
-
     @GetMapping
     @Operation(summary = "Tüm görevleri al", description = "Tüm görevlerin listesini alır")
     public ResponseEntity<List<TaskResponse>> getAllTasks() {
@@ -89,7 +90,7 @@ public class TaskController {
         }
     }
 
-    @PutMapping("/move")
+  @PutMapping("/move")
     @Operation(summary = "Görevi taşı", description = "Bir görevi bir karttan başka bir karta taşır")
     public ResponseEntity<TaskResponse> moveTask(@RequestBody MoveTaskRequest moveTaskRequest) {
         Optional<Task> taskOpt = taskService.findById(moveTaskRequest.getTaskId());
@@ -101,12 +102,14 @@ public class TaskController {
             Card sourceCard = sourceCardOpt.get();
             Card destinationCard = destinationCardOpt.get();
 
-            sourceCard.getTasks().remove(task);
-            destinationCard.getTasks().add(task);
-            task.setCard(destinationCard);
+            // Update source card task orders
+            taskService.updateTaskOrdersAfterRemoval(sourceCard, task);
 
-            cardService.save(sourceCard);
-            cardService.save(destinationCard);
+            // Update destination card task orders
+            taskService.updateTaskOrdersAfterInsertion(destinationCard, task, moveTaskRequest.getNewOrder());
+
+            task.setCard(destinationCard);
+            task.setTaskOrder(moveTaskRequest.getNewOrder());
             Task savedTask = taskService.save(task);
             return ResponseEntity.ok(new TaskResponse(savedTask));
         } else {
@@ -119,6 +122,7 @@ public class TaskController {
         private Long taskId;
         private Long sourceCardId;
         private Long destinationCardId;
+        private int newOrder;
 
         // Getters and setters
         public Long getTaskId() { return taskId; }
@@ -129,6 +133,9 @@ public class TaskController {
 
         public Long getDestinationCardId() { return destinationCardId; }
         public void setDestinationCardId(Long destinationCardId) { this.destinationCardId = destinationCardId; }
+
+        public int getNewOrder() { return newOrder; }
+        public void setNewOrder(int newOrder) { this.newOrder = newOrder; }
     }
 
     // TaskResponse iç sınıfı
