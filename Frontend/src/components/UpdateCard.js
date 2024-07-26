@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, IconButton, Typography } from '@mui/material';
+import { Input, IconButton, Typography, Box } from '@mui/material';
 import { Edit, Save, Cancel } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { updateCardTitle } from '../store/KanbanSlice/kanbanSlice';
@@ -27,8 +27,9 @@ const UpdateCard = ({ list }) => {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
       {isEditing ? (
-        <>
+        <Box sx={{marginBottom:"5px"}}>
           <Input 
+            
             type="text"
             value={newTitle}
             onChange={handleTitleChange}
@@ -42,7 +43,7 @@ const UpdateCard = ({ list }) => {
           <IconButton onClick={() => setIsEditing(false)} size="small">
             <Cancel fontSize="small" />
           </IconButton>
-        </>
+        </Box>
       ) : (
         <>
           <Typography style={{ color: '#000000', flexGrow: 1 }} variant="h6" gutterBottom>

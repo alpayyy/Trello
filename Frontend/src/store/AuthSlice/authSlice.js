@@ -1,10 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { fetchUserCards } from '../KanbanSlice/kanbanSlice'; // Import the fetchUserCards action
+import { fetchUserCards } from '../KanbanSlice/kanbanSlice'; 
 
 const BASE_ENDPOINT = "http://localhost:8080/api";
 
-// Local storage'dan kullanıcıyı al
 const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
 const initialState = {
@@ -22,7 +21,7 @@ export const fetchUser = createAsyncThunk(
                 `${BASE_ENDPOINT}/users/login`,
                 input
             );
-            dispatch(fetchUserCards(response.data.id)); // Dispatch fetchUserCards after login
+            dispatch(fetchUserCards(response.data.id)); 
             console.log(response.data);
             return response.data;
         } catch (error) {

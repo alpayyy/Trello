@@ -122,7 +122,7 @@ const kanbanSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action) => {
         const list = state.lists.find(list => list.id === action.payload.cardId);
         if (list) {
-          if (!list.tasks) list.tasks = []; // Ensure tasks is always an array
+          if (!list.tasks) list.tasks = []; 
           list.tasks.push(action.payload);
         }
       })
@@ -144,7 +144,7 @@ const kanbanSlice = createSlice({
           const task = sourceList.tasks.find(task => task.id === id);
           if (task) {
             sourceList.tasks = sourceList.tasks.filter(task => task.id !== id);
-            if (!destinationList.tasks) destinationList.tasks = []; // Ensure tasks is always an array
+            if (!destinationList.tasks) destinationList.tasks = []; 
             destinationList.tasks.push(task);
           }
         }
@@ -152,7 +152,7 @@ const kanbanSlice = createSlice({
       .addCase(createCardForUser.fulfilled, (state, action) => {
         state.lists.push({
           ...action.payload,
-          tasks: [] // Initialize tasks as an empty array for new cards
+          tasks: [] 
         });
       })
       .addCase(deleteCard.fulfilled, (state, action) => {
