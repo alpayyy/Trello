@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Paper, Button, useTheme, IconButton } from '@mui/material';
+import { Paper, Button, useTheme, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import Task from './Task';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
@@ -13,6 +13,7 @@ function Column({ list, tasks }) {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleClickOpen = (task) => {
     setSelectedTask(task);
@@ -36,7 +37,16 @@ function Column({ list, tasks }) {
   };
 
   const handleDeleteClick = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmDelete = () => {
     dispatch(deleteCard(list.id));
+    setConfirmOpen(false);
   };
 
   return (
@@ -88,6 +98,28 @@ function Column({ list, tasks }) {
       </Button>
 
       <CardDialog open={open} handleClose={handleClose} card={selectedTask} handleSaveTask={handleSaveTask} />
+
+      <Dialog
+        open={confirmOpen}
+        onClose={handleConfirmClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Kartı silmek istediğinize emin misiniz?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Bu işlem geri alınamaz.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmClose} color="primary">
+            Hayır
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            Evet
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 }
