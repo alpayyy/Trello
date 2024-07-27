@@ -10,6 +10,7 @@ import theme from '../src/styles/theme';
 import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';
 import Profile from './pages/Profile';
+import EditProfile from './pages/Profile/EditProfile';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile/>} />
+            <Route path="/edit-profile" element={<EditProfile />} />
           </Routes>
         </Router>
       </ThemeProvider>

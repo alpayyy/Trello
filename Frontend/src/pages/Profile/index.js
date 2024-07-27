@@ -21,6 +21,10 @@ const Profile = () => {
         navigate('/');
     };
 
+    const handleEditProfile = () => {
+        navigate('/edit-profile');
+    };
+
     if (loading) {
         return (
             <ProfileContainer>
@@ -48,6 +52,9 @@ const Profile = () => {
                 </ProfileInfoItem>
                 <Button variant="contained" color="primary" onClick={handleLogout}>
                     Çıkış Yap
+                </Button>
+                <Button variant="contained" color="secondary" onClick={handleEditProfile} style={{ marginLeft: '10px' }}>
+                    Bilgileri Güncelle
                 </Button>
             </ProfilePaper>
         </ProfileContainer>

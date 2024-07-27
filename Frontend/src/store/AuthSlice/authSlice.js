@@ -45,6 +45,18 @@ export const registerUser = createAsyncThunk(
     }
 );
 
+export const updateUser = createAsyncThunk(
+    'auth/updateUser',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const response = await axios.put(`${BASE_ENDPOINT}/users/${storedUser.id}`, userData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -91,6 +103,21 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload;
+            })
+            .addCase(updateUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                localStorage.setItem('user', JSON.stringify(action.payload));
+                console.log("User update successful: ", action.payload);
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                console.log("User update failed: ", action.payload);
             });
     },
 });
