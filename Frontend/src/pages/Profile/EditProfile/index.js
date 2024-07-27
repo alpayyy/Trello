@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { updateUser } from '../../../store/AuthSlice/authSlice';
 import { ProfileContainer, ProfilePaper } from '../style';
@@ -18,6 +18,8 @@ const EditProfile = () => {
         password: '',
     });
 
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -27,7 +29,16 @@ const EditProfile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmClose = () => {
+        setConfirmOpen(false);
+    };
+
+    const handleConfirmUpdate = () => {
         dispatch(updateUser({ ...formData, id: user.id }));
+        setConfirmOpen(false);
         navigate('/profile');
     };
 
@@ -82,6 +93,28 @@ const EditProfile = () => {
                     </Button>
                 </form>
             </ProfilePaper>
+
+            <Dialog
+                open={confirmOpen}
+                onClose={handleConfirmClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Bilgileri güncellemek istediğinize emin misiniz?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bu işlem kullanıcı profil bilgilerinizi güncelleyecektir. Devam etmek istediğinizden emin misiniz?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose} color="primary">
+                        Hayır
+                    </Button>
+                    <Button onClick={handleConfirmUpdate} color="primary" autoFocus>
+                        Evet
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </ProfileContainer>
     );
 };

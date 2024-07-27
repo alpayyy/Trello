@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Typography, CircularProgress, Button } from '@mui/material';
+import { Typography, CircularProgress, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProfileContainer, ProfileAvatar, ProfilePaper, ProfileInfoItem } from './style';
 import { logout } from '../../store/AuthSlice/authSlice';
@@ -9,6 +9,7 @@ const Profile = () => {
     const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -17,7 +18,16 @@ const Profile = () => {
     }, [isAuthenticated, navigate]);
 
     const handleLogout = () => {
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmClose = () => {
+        setConfirmOpen(false);
+    };
+
+    const handleConfirmLogout = () => {
         dispatch(logout());
+        setConfirmOpen(false);
         navigate('/');
     };
 
@@ -57,6 +67,28 @@ const Profile = () => {
                     Bilgileri Güncelle
                 </Button>
             </ProfilePaper>
+
+            <Dialog
+                open={confirmOpen}
+                onClose={handleConfirmClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Çıkış yapmak istediğinize emin misiniz?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Oturumunuzu kapatmak istediğinizden emin misiniz?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose} color="primary">
+                        Hayır
+                    </Button>
+                    <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+                        Evet
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </ProfileContainer>
     );
 };
