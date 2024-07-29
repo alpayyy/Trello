@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Snackbar, Alert, Slide } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from "../../../store/AuthSlice/authSlice";
 import registerSchema from '../Register/validations';
@@ -10,6 +10,17 @@ const Register = () => {
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.auth);
     const navigate = useNavigate();
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
+    const TransitionUp = (props) => {
+        return <Slide {...props} direction="down" />;
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -21,11 +32,22 @@ const Register = () => {
             confirmPassword: '',
         },
         validationSchema: registerSchema,
-        onSubmit: (values, {resetForm}) => {
+        onSubmit: async (values, { resetForm }) => {
             const { confirmPassword, ...userValues } = values;
-            dispatch(registerUser(userValues));
-            resetForm()
-            navigate('/login');
+            const result = await dispatch(registerUser(userValues));
+            if (registerUser.fulfilled.match(result)) {
+                setSnackbarMessage('Başarıyla kayıt olundu. Giriş sayfasına yönlendiriliyorsunuz!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
+                resetForm();
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
+            } else {
+                setSnackbarMessage(error || 'Kayıt başarısız oldu. Lütfen bilgilerinizi kontrol edin.');
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
+            }
         },
     });
 
@@ -119,7 +141,6 @@ const Register = () => {
                     <Button color="primary" variant="contained" fullWidth type="submit" style={{ marginTop: '16px' }} disabled={loading}>
                         {loading ? 'Kayıt Olunuyor...' : 'Kayıt Ol'}
                     </Button>
-                    {error && <Typography color="error" variant="body2" style={{ marginTop: '16px' }}>{error}</Typography>}
                 </form>
                 <Typography variant="body2" style={{ marginTop: '16px' }}>
                     Zaten bir hesabınız var mı?{' '}
@@ -128,6 +149,18 @@ const Register = () => {
                     </Link>
                 </Typography>
             </Box>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                TransitionComponent={TransitionUp}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };

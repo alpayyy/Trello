@@ -22,10 +22,10 @@ export const fetchUser = createAsyncThunk(
                 input
             );
             dispatch(fetchUserCards(response.data.id)); 
-            console.log(response.data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+            const errorMessage = error.response && error.response.data && error.response.data.error ? error.response.data.error : 'Network error';
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -40,7 +40,8 @@ export const registerUser = createAsyncThunk(
             );
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+            const errorMessage = error.response && error.response.data && error.response.data.error ? error.response.data.error : 'Network error';
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -52,7 +53,8 @@ export const updateUser = createAsyncThunk(
             const response = await axios.put(`${BASE_ENDPOINT}/users/${storedUser.id}`, userData);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response ? error.response.data.error : 'Network error');
+            const errorMessage = error.response && error.response.data && error.response.data.error ? error.response.data.error : 'Network error';
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -83,13 +85,11 @@ const authSlice = createSlice({
                 state.user = action.payload;
                 state.isAuthenticated = true;
                 localStorage.setItem('user', JSON.stringify(action.payload));
-                console.log("User login successful: ", action.payload);
             })
             .addCase(fetchUser.rejected, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload;
-                console.log("User login failed: ", action.payload);
             })
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;
@@ -103,6 +103,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload;
+                console.log(action.payload)
             })
             .addCase(updateUser.pending, (state) => {
                 state.loading = true;
@@ -112,12 +113,10 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.user = action.payload;
                 localStorage.setItem('user', JSON.stringify(action.payload));
-                console.log("User update successful: ", action.payload);
             })
             .addCase(updateUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                console.log("User update failed: ", action.payload);
             });
     },
 });

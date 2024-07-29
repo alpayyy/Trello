@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TextField, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { TextField, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, Slide } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { updateUser } from '../../../store/AuthSlice/authSlice';
 import { ProfileContainer, ProfilePaper } from '../style';
 
 const EditProfile = () => {
-    const { user } = useSelector((state) => state.auth);
+    const { user, error } = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -19,6 +19,17 @@ const EditProfile = () => {
     });
 
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
+    const TransitionUp = (props) => {
+        return <Slide {...props} direction="down" />;
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -36,11 +47,30 @@ const EditProfile = () => {
         setConfirmOpen(false);
     };
 
-    const handleConfirmUpdate = () => {
-        dispatch(updateUser({ ...formData, id: user.id }));
+    const handleConfirmUpdate = async () => {
+        const result = await dispatch(updateUser({ ...formData, id: user.id }));
         setConfirmOpen(false);
-        navigate('/profile');
+        if (updateUser.fulfilled.match(result)) {
+            setSnackbarMessage('Bilgiler başarıyla güncellendi!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+            setTimeout(() => {
+                navigate('/profile');
+            }, 3000);
+        } else {
+            setSnackbarMessage(error || 'Bilgiler güncellenemedi. Lütfen tekrar deneyin.');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
     };
+
+    useEffect(() => {
+        if (error) {
+            setSnackbarMessage(error || 'Bilgiler güncellenemedi. Lütfen tekrar deneyin.');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
+    }, [error]);
 
     return (
         <ProfileContainer>
@@ -115,6 +145,18 @@ const EditProfile = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                TransitionComponent={TransitionUp}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </ProfileContainer>
     );
 };

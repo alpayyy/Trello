@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Snackbar, Alert, Slide } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser } from "../../../store/AuthSlice/authSlice"; // Doğru dosya yolunu kullanın
 import validationSchema from '../Login/validations';
@@ -10,6 +10,17 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
+    const TransitionUp = (props) => {
+        return <Slide {...props} direction="down" />;
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -17,19 +28,25 @@ const Login = () => {
             password: '',
         },
         validationSchema: validationSchema,
-        onSubmit: (values, {resetForm}) => {
+        onSubmit: (values) => {
             dispatch(fetchUser(values));
-            resetForm()
         },
     });
 
-    // Giriş başarılı olduğunda ana sayfaya yönlendir
-    React.useEffect(() => {
+    useEffect(() => {
         if (isAuthenticated) {
-            
-            navigate('/');
+            setSnackbarMessage('Başarıyla giriş yapıldı. Ana sayfaya yönlendiriliyorsunuz!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+        } else if (error) {
+            setSnackbarMessage('Giriş başarısız oldu. Lütfen bilgilerinizi kontrol edin.');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, error, navigate]);
 
     return (
         <Container maxWidth="sm">
@@ -80,7 +97,6 @@ const Login = () => {
                     >
                         {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
                     </Button>
-                    {error && <Typography color="error" variant="body2" style={{ marginTop: '16px' }}>{error}</Typography>}
                 </form>
                 <Typography variant="body2" style={{ marginTop: '16px' }}>
                     Hesabınız yok mu?{' '}
@@ -89,6 +105,18 @@ const Login = () => {
                     </Link>
                 </Typography>
             </Box>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                TransitionComponent={TransitionUp}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
